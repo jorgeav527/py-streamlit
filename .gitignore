@@ -1,0 +1,49 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# Distribuciones / empaquetado
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Herramientas de testing y cobertura
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Type checkers / linters
+.mypy_cache/
+.ruff_cache/
+.pyright/
+
+# uv
+.uv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Entorno / secretos
+.env
+.env.*
+*.local
+
+# Streamlit (secretos; conservamos .streamlit/config.toml)
+.streamlit/secrets.toml
+
+# Editores / sistema operativo
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

@@ -8,7 +8,7 @@ muestra componentes de Streamlit **en vivo**, con código Python sencillo.
 
 - Crear interfaces web con Python puro.
 - Capturar datos con formularios y widgets.
-- Mostrar tablas, métricas y gráficos (integrados, Matplotlib y Altair).
+- Mostrar tablas, métricas y gráficos (Matplotlib y Altair).
 - Usar estado de sesión, caché, cámara/audio, diálogos y chat.
 - Organizar una app real en varias páginas.
 
@@ -85,11 +85,10 @@ Tiene dos pestañas:
 Flujo típico de análisis:
 
 1. `st.file_uploader` para subir tu propio CSV (o usar `data/gapminder.csv`).
-2. Explorar con `st.dataframe` + `st.column_config`.
-3. Editar con `st.data_editor`.
-4. Graficar con `st.line_chart`, `st.bar_chart`, `st.area_chart`,
-   `st.scatter_chart`, Matplotlib (`st.pyplot`), Altair (`st.altair_chart`) y
-   `st.map`.
+2. Revisar el resumen del dataset con `df.info()`. Como `df.info()` imprime en
+   consola, se captura con `io.StringIO` y se muestra con `st.text`.
+3. Graficar con Matplotlib (`st.pyplot`) para la evolución de la esperanza de
+   vida y con Altair (`st.altair_chart`) para el gráfico interactivo.
 
 ## Cheatsheet rápido
 
@@ -102,7 +101,7 @@ Flujo típico de análisis:
 | Ordenar el layout | `st.columns`, `st.container`, `st.expander`, `st.tabs`, `st.sidebar` |
 | Pedir datos | `st.text_input`, `st.number_input`, `st.selectbox`, `st.slider`, `st.file_uploader` |
 | Agrupar un formulario | `st.form` + `st.form_submit_button` |
-| Graficar | `st.line_chart`, `st.bar_chart`, `st.scatter_chart`, `st.pyplot`, `st.altair_chart` |
+| Graficar | `st.pyplot`, `st.altair_chart`, `st.line_chart`, `st.bar_chart` |
 | Mostrar progreso | `st.spinner`, `st.progress`, `st.status` |
 | Guardar estado | `st.session_state` |
 | Acelerar cargas | `@st.cache_data` |
@@ -121,9 +120,9 @@ st.write("¡Hola desde mi componente!")
 
 ## Nota sobre recursos externos
 
-La pestaña de multimedia usa imágenes, audio y video de internet
-(Unsplash, SoundHelix y YouTube). Necesitas conexión para verlos; el resto de la
-app funciona sin internet.
+La sección de multimedia (dentro de Inicio) usa imágenes, audio y video de
+internet (Unsplash, SoundHelix y YouTube). Necesitas conexión para verlos; el
+resto de la app funciona sin internet.
 
 ## Solución de problemas
 
