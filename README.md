@@ -1,35 +1,31 @@
 # Streamlit para Data Analytics — Cibertec
 
-Laboratorio interactivo para aprender Streamlit desde cero, pensado para
+Laboratorio interactivo para aprender **Streamlit** desde cero, pensado para
 estudiantes de analítica de datos. La app es **multipágina** y cada sección
-muestra componentes de Streamlit **en vivo**, con código Python sencillo.
+muestra componentes de Streamlit **en vivo**, con código Python sencillo y
+directo (sin helpers ni `__init__.py`).
 
-## ¿Qué vas a aprender?
+## ¿Qué incluye?
 
-- Crear interfaces web con Python puro.
-- Capturar datos con formularios y widgets.
-- Mostrar tablas, métricas y gráficos (Matplotlib y Altair).
-- Usar estado de sesión, caché, cámara/audio, diálogos y chat.
-- Organizar una app real en varias páginas.
+- **Home** con dos pestañas: componentes básicos/métricas y formularios.
+- **Análisis**: subir un CSV, revisar el dataset y graficar con Matplotlib y
+  Altair.
+- **Extra**: cámara, audio, estado de sesión, caché, feedback, modales,
+  diagramas y chat.
 
 ## Requisitos
 
 - Python 3.13+
 - [uv](https://docs.astral.sh/uv/)
 
-## Instalación
+## Instalación y ejecución
 
 ```bash
 uv sync
-```
-
-## Cómo ejecutar
-
-```bash
 uv run streamlit run src/main.py
 ```
 
-> Ejecuta siempre desde la **raíz del proyecto**. El dataset se lee con la ruta
+> Ejecuta siempre desde la **raíz del proyecto**: el dataset se lee con la ruta
 > relativa `data/gapminder.csv`.
 
 Streamlit abrirá la app en `http://localhost:8501`.
@@ -38,82 +34,165 @@ Streamlit abrirá la app en `http://localhost:8501`.
 
 ```
 py-streamlit/
-├── pyproject.toml
-├── README.md
-├── .streamlit/config.toml          # tema y preferencias
+├── .streamlit/
+│   └── config.toml        # tema y telemetría
 ├── data/
-│   └── gapminder.csv               # dataset de ejemplo
-└── src/
-    ├── main.py                     # punto de entrada (st.navigation)
-    ├── data.py                     # load_gapminder()
-    ├── inicio_page.py              # página Inicio (2 tabs)
-    ├── texto.py                    # tab Básicas y métricas
-    ├── widgets.py                  # tab Formularios
-    ├── avanzado_page.py            # página Avanzado
-    └── analisis_page.py            # página Análisis
+│   └── gapminder.csv      # dataset de ejemplo
+├── src/
+│   ├── main.py            # entrada: st.navigation + st.Page
+│   ├── home_page.py       # página Home (2 tabs)
+│   ├── texto.py           # tab Básicas y métricas
+│   ├── formularios.py     # tab Formularios
+│   ├── analisis_page.py   # página Análisis (datos + gráficos)
+│   └── extra_page.py      # página Extra (funciones avanzadas)
+├── .gitignore
+├── .python-version
+├── pyproject.toml
+├── uv.lock
+└── README.md
 ```
 
-Los archivos de página terminan en `_page.py` (`inicio_page.py`,
-`avanzado_page.py`, `analisis_page.py`). `texto.py` y `widgets.py` son las
-pestañas internas de Inicio.
+Cada módulo de página o sección (`home_page`, `texto`, `formularios`,
+`analisis_page`, `extra_page`) es un archivo independiente que expone una
+función `render()`. No hay paquetes ni `__init__.py`: `main.py` importa los
+archivos directamente (`import home_page`, `import analisis_page`,
+`import extra_page`).
+
+## Cómo funciona la navegación
+
+`src/main.py` configura la página y registra las páginas con `st.Page`:
+
+```python
+import streamlit as st
+
+def app():
+    st.set_page_config(page_title="Cibertec - Streamlit Lab", page_icon="📊", layout="wide")
+
+    import analisis_page
+    import extra_page
+    import home_page
+
+    paginas = [
+        st.Page(home_page.render, title="Home", icon="🏠", url_path="home", default=True),
+        st.Page(analisis_page.render, title="Análisis", icon="📊", url_path="analisis"),
+        st.Page(extra_page.render, title="Extra", icon="✨", url_path="extra"),
+    ]
+    st.navigation(paginas).run()
+
+if __name__ == "__main__":
+    app()
+```
 
 ## Recorrido por la app
 
-### 🏠 Inicio
+### 🏠 Home (`home_page.py`)
 
-Tiene dos pestañas:
+Página de bienvenida con enlaces a la documentación y al cheatsheet. Tiene dos
+pestañas:
 
-- **🧱 Básicas y métricas**: títulos, Markdown, `st.code`, `st.json`, LaTeX,
-  insignias, alertas (`info`, `success`, `warning`, `error`), KPIs con
-  `st.metric`, columnas, contenedores, desplegables y multimedia.
-- **🧾 Formularios**: `text_input`, `number_input`, `selectbox`, `multiselect`,
-  `radio`, `pills`, `segmented_control`, `slider`, `select_slider`, `checkbox`,
-  `toggle`, `date_input`, `time_input`, `color_picker`, `st.form`, botones,
-  descargas y enlaces.
+#### 🧱 Básicas y métricas (`texto.py`)
 
-### ✨ Avanzado
+- Títulos y Markdown (`st.title`, `st.header`, `st.subheader`, `st.markdown`).
+- Código (`st.code`) y JSON (`st.json`), incluida una función de limpieza
+  `clean_data`.
+- LaTeX, insignias (`st.badge`) y HTML (`st.html`).
+- Alertas: `st.info`, `st.success`, `st.warning`, `st.error`.
+- KPIs con `st.metric` en columnas.
+- Layout: `st.container(border=True)`, `st.columns(..., border=True)` con
+  `with` para ver el ancho 2/3 vs 1/3, `st.expander` y `st.popover`.
+- Multimedia: `st.image`, `st.video` y `st.audio`.
 
-- `st.camera_input` y `st.audio_input`: captura de foto y voz.
-- `st.session_state`: estado que sobrevive a los reruns.
-- `@st.cache_data`: reutilizar cálculos costosos.
-- Feedback: `st.spinner`, `st.progress`, `st.status`, `st.skeleton`, `st.toast`.
-- `@st.fragment(run_every=...)`: actualizar solo una parte de la página.
-- `@st.dialog`: ventanas modales.
-- `st.chat_message` + `st.chat_input`: interfaces de chat.
-- `st.query_params`: guardar estado en la URL.
-- `st.mermaid_chart`, `st.echarts_chart`: diagramas y gráficos extra.
+#### 🧾 Formularios (`formularios.py`)
 
-### 📊 Análisis
+- Entradas: `st.text_input`, `st.number_input`, `st.text_area`.
+- Selección: `st.selectbox`, `st.multiselect`, `st.radio`, `st.pills`,
+  `st.segmented_control`; el resultado se muestra con `st.json`.
+- Valores: `st.slider`, `st.select_slider`.
+- Booleanos, fechas y colores: `st.checkbox`, `st.toggle`, `st.date_input`,
+  `st.time_input`, `st.color_picker`.
+- Formularios: `st.form` + `st.form_submit_button`.
+- Acciones: `st.button` y `st.download_button`.
 
-Flujo típico de análisis:
+### 📊 Análisis (`analisis_page.py`)
 
-1. `st.file_uploader` para subir tu propio CSV (o usar `data/gapminder.csv`).
-2. Revisar el resumen del dataset con `df.info()`. Como `df.info()` imprime en
-   consola, se captura con `io.StringIO` y se muestra con `st.text`.
-3. Graficar con Matplotlib (`st.pyplot`) para la evolución de la esperanza de
-   vida y con Altair (`st.altair_chart`) para el gráfico interactivo.
+Flujo típico de un analista: **cargar → explorar → graficar**.
+
+1. **Carga de datos** (`cargar_datos`): `st.file_uploader` para subir un CSV; si
+   no se sube nada, usa `data/gapminder.csv`. Muestra 5 filas con `st.dataframe`.
+2. **Resumen del dataset**: `df.info()` se captura con `io.StringIO` y se muestra
+   con `st.text` (porque `df.info()` imprime en consola, no en la página).
+3. **Gráfico estático** (`grafico_matplotlib`): un `st.multiselect` elige los
+   países (por defecto los 4 primeros) y se dibuja la evolución de la esperanza
+   de vida con Matplotlib (`st.pyplot`).
+4. **Gráfico interactivo** (`grafico_altair`): un `st.select_slider` elige el año
+   y se muestra un scatter de PIB per cápita vs esperanza de vida para **todos
+   los países** de ese año, coloreado por continente y con tooltips
+   (`st.altair_chart`).
+
+Columnas esperadas del CSV:
+
+```
+country, year, pop, continent, lifeExp, gdpPercap
+```
+
+### ✨ Extra (`extra_page.py`)
+
+- **Captura de medios**: `st.camera_input` y `st.audio_input`; la foto grabada se
+  muestra con `st.image` y el audio con `st.audio`.
+- **Estado de sesión**: contador con `st.session_state`.
+- **Caché**: `@st.cache_data` sobre un cálculo costoso simulado.
+- **Feedback**: `st.spinner`, `st.progress`, `st.status`, `st.toast` y
+  `st.skeleton`.
+- **Diálogos**: `@st.dialog` para abrir una ventana modal.
+- **Diagramas**: `st.mermaid_chart`.
+- **Chat**: `st.chat_message` + `st.chat_input`, guardando el historial en
+  `st.session_state` y usando `st.rerun()` para repintar.
+
+## Dataset de ejemplo
+
+`data/gapminder.csv`:
+
+- **1704 filas**, **6 columnas**.
+- **142 países**, **5 continentes**.
+- Años **1952–2007** (12 cortes cada 5 años).
+- Columnas: `country`, `year`, `pop`, `continent`, `lifeExp`, `gdpPercap`.
+
+Es el dataset clásico de Gapminder: población, continente, esperanza de vida y
+PIB per cápita por país y año.
 
 ## Cheatsheet rápido
 
-| Necesito… | Componente |
-|---|---|
-| Escribir texto | `st.write`, `st.markdown`, `st.title`, `st.caption` |
-| Mostrar código / datos | `st.code`, `st.json`, `st.dataframe`, `st.table` |
-| Alertas | `st.info`, `st.success`, `st.warning`, `st.error` |
-| KPIs | `st.metric` |
-| Ordenar el layout | `st.columns`, `st.container`, `st.expander`, `st.tabs`, `st.sidebar` |
-| Pedir datos | `st.text_input`, `st.number_input`, `st.selectbox`, `st.slider`, `st.file_uploader` |
-| Agrupar un formulario | `st.form` + `st.form_submit_button` |
-| Graficar | `st.pyplot`, `st.altair_chart`, `st.line_chart`, `st.bar_chart` |
-| Mostrar progreso | `st.spinner`, `st.progress`, `st.status` |
-| Guardar estado | `st.session_state` |
-| Acelerar cargas | `@st.cache_data` |
-| Navegar entre páginas | `st.navigation`, `st.Page`, `st.switch_page` |
+| Necesito… | Componente | Dónde se ve |
+|---|---|---|
+| Texto y títulos | `st.title`, `st.header`, `st.markdown`, `st.caption` | Home › Básicas |
+| Código / JSON | `st.code`, `st.json` | Home › Básicas |
+| Alertas | `st.info`, `st.success`, `st.warning`, `st.error` | Home › Básicas |
+| KPIs | `st.metric` | Home › Básicas / Extra |
+| Layout | `st.columns`, `st.container`, `st.tabs`, `st.expander`, `st.popover` | Home |
+| Imagen / audio / video | `st.image`, `st.audio`, `st.video` | Home › Básicas |
+| Pedir texto/números | `st.text_input`, `st.number_input`, `st.text_area` | Home › Formularios |
+| Elegir opciones | `st.selectbox`, `st.multiselect`, `st.radio`, `st.pills`, `st.segmented_control` | Home › Formularios |
+| Sliders | `st.slider`, `st.select_slider` | Home › Formularios |
+| Booleanos / fechas / colores | `st.checkbox`, `st.toggle`, `st.date_input`, `st.time_input`, `st.color_picker` | Home › Formularios |
+| Agrupar un formulario | `st.form` + `st.form_submit_button` | Home › Formularios |
+| Botones / descargas | `st.button`, `st.download_button` | Home › Formularios |
+| Subir un CSV | `st.file_uploader` | Análisis |
+| Tablas | `st.dataframe` | Análisis |
+| Gráfico estático | Matplotlib + `st.pyplot` | Análisis |
+| Gráfico interactivo | Altair + `st.altair_chart` | Análisis |
+| Cámara / micrófono | `st.camera_input`, `st.audio_input` | Extra |
+| Guardar estado | `st.session_state` | Extra |
+| Acelerar cálculos | `@st.cache_data` | Extra |
+| Progreso / avisos | `st.spinner`, `st.progress`, `st.status`, `st.toast`, `st.skeleton` | Extra |
+| Modales | `@st.dialog` | Extra |
+| Diagramas | `st.mermaid_chart` | Extra |
+| Chat | `st.chat_message`, `st.chat_input` | Extra |
+| Navegación | `st.navigation`, `st.Page` | `main.py` |
 
 ## Cómo agregar tu propio componente
 
-1. Abre el archivo que corresponda en `src/` (por ejemplo `texto.py` o
-   `analisis_page.py`).
+1. Abre el archivo que corresponda en `src/` (`texto.py`, `formularios.py`,
+   `analisis_page.py`, `extra_page.py`).
 2. Agrega el título, la descripción y el componente con Streamlit directo:
 
 ```python
@@ -122,22 +201,51 @@ st.caption("Explicación breve de qué hace.")
 st.write("¡Hola desde mi componente!")
 ```
 
-## Nota sobre recursos externos
+### Agregar una página nueva
 
-La sección de multimedia (dentro de Inicio) usa imágenes, audio y video de
-internet (Unsplash, SoundHelix y YouTube). Necesitas conexión para verlos; el
-resto de la app funciona sin internet.
+1. Crea `src/mi_page.py` con una función `render()`:
+
+```python
+import streamlit as st
+
+def render():
+    st.header("Mi página")
+    st.write("Contenido de mi página.")
+```
+
+2. Regístrala en `src/main.py`:
+
+```python
+import mi_page
+
+paginas = [
+    # ...
+    st.Page(mi_page.render, title="Mi página", icon="📄", url_path="mi-page"),
+]
+```
+
+## Notas y limitaciones
+
+- La ruta `data/gapminder.csv` es **relativa**: ejecuta desde la raíz.
+- El CSV que subas debe tener las mismas columnas que Gapminder
+  (`country`, `year`, `pop`, `continent`, `lifeExp`, `gdpPercap`). No hay
+  validación: si faltan columnas, los gráficos fallarán con `KeyError`.
+- `df.sample(5)` muestra filas distintas en cada rerun (útil para explorar, pero
+  cambia al interactuar).
+- La sección de multimedia usa imágenes, audio y video de internet (Unsplash,
+  SoundHelix y YouTube); necesitas conexión para verlos.
+- No hay pruebas automatizadas; la verificación es manual abriendo la app.
 
 ## Solución de problemas
 
 - **`FileNotFoundError: data/gapminder.csv`** → ejecuta la app desde la raíz del
   proyecto.
-- **`ModuleNotFoundError: streamlit`** → ejecuta `uv sync` antes de correr la
-  app.
-- **La app no se actualiza** → revisa que no haya un error en la consola; guarda
-  el archivo y Streamlit recargará.
-- **Los datos cambiaron solos** → `@st.cache_data` guarda resultados; usa el
-  menú «Clear cache» o cambia los argumentos de la función.
+- **`ModuleNotFoundError: streamlit`** (o falta Matplotlib/Altair) → ejecuta
+  `uv sync`.
+- **`KeyError: 'country'` (o similar)** → el CSV subido no tiene el esquema de
+  Gapminder.
+- **La app no se actualiza** → revisa la consola; guarda el archivo y Streamlit
+  recargará.
 - **Aviso de `use_container_width` deprecado** → usa `width="stretch"`.
 
 ## Recursos
@@ -145,3 +253,4 @@ resto de la app funciona sin internet.
 - Documentación: <https://docs.streamlit.io>
 - Cheatsheet: <https://docs.streamlit.io/develop/quick-reference/cheat-sheet>
 - Galería de apps: <https://streamlit.io/gallery>
+- Dataset Gapminder: <https://www.gapminder.org/data/>
