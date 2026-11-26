@@ -26,7 +26,7 @@ uv sync
 ## Cómo ejecutar
 
 ```bash
-uv run streamlit run src/py_streamlit/main.py
+uv run streamlit run src/main.py
 ```
 
 > Ejecuta siempre desde la **raíz del proyecto**. El dataset se lee con la ruta
@@ -43,16 +43,19 @@ py-streamlit/
 ├── .streamlit/config.toml          # tema y preferencias
 ├── data/
 │   └── gapminder.csv               # dataset de ejemplo
-└── src/py_streamlit/
+└── src/
     ├── main.py                     # punto de entrada (st.navigation)
     ├── data.py                     # load_gapminder()
-    └── sections/
-        ├── inicio.py               # página Inicio (2 tabs)
-        ├── texto.py                # tab Básicas y métricas
-        ├── widgets.py              # tab Formularios
-        ├── avanzado.py             # página Avanzado
-        └── analisis.py             # página Análisis
+    ├── inicio_page.py              # página Inicio (2 tabs)
+    ├── texto.py                    # tab Básicas y métricas
+    ├── widgets.py                  # tab Formularios
+    ├── avanzado_page.py            # página Avanzado
+    └── analisis_page.py            # página Análisis
 ```
+
+Los archivos de página terminan en `_page.py` (`inicio_page.py`,
+`avanzado_page.py`, `analisis_page.py`). `texto.py` y `widgets.py` son las
+pestañas internas de Inicio.
 
 ## Recorrido por la app
 
@@ -109,7 +112,8 @@ Flujo típico de análisis:
 
 ## Cómo agregar tu propio componente
 
-1. Abre la sección/página que corresponda en `src/py_streamlit/sections/`.
+1. Abre el archivo que corresponda en `src/` (por ejemplo `texto.py` o
+   `analisis_page.py`).
 2. Agrega el título, la descripción y el componente con Streamlit directo:
 
 ```python
@@ -128,8 +132,8 @@ resto de la app funciona sin internet.
 
 - **`FileNotFoundError: data/gapminder.csv`** → ejecuta la app desde la raíz del
   proyecto.
-- **`ModuleNotFoundError: py_streamlit`** → ejecuta `uv sync` y usa
-  `uv run streamlit run ...`.
+- **`ModuleNotFoundError: streamlit`** → ejecuta `uv sync` antes de correr la
+  app.
 - **La app no se actualiza** → revisa que no haya un error en la consola; guarda
   el archivo y Streamlit recargará.
 - **Los datos cambiaron solos** → `@st.cache_data` guarda resultados; usa el

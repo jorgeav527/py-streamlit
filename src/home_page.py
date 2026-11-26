@@ -1,14 +1,13 @@
-"""Página de inicio: una app multipágina con dos pestañas."""
-
 import streamlit as st
 
-from . import texto, widgets
+import formularios
+import texto
 
 DOCS_URL = "https://docs.streamlit.io"
 CHEATSHEET_URL = "https://docs.streamlit.io/develop/quick-reference/cheat-sheet"
 
 
-def render() -> None:
+def render():
     st.title("🚀 Streamlit para Data Analytics")
     st.caption("Cibertec · Laboratorio interactivo de componentes")
 
@@ -22,11 +21,9 @@ def render() -> None:
 
     st.divider()
 
-    tab_basicas, tab_formularios = st.tabs(
-        ["🧱 Básicas y métricas", "🧾 Formularios"]
-    )
+    tab_basicas, tab_formularios = st.tabs(["🧱 Básicas y métricas", "🧾 Formularios"])
 
     with tab_basicas:
         texto.render()
     with tab_formularios:
-        widgets.render()
+        formularios.render()
